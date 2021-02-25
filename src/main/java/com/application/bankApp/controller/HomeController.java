@@ -28,7 +28,6 @@ import com.application.bankApp.model.User;
 import com.application.bankApp.repository.RoleRepository;
 import com.application.bankApp.security.UserRole;
 import com.application.bankApp.service.UserService;
-import com.application.bankApp.utility.MailConstructor;
 import com.application.bankApp.utility.SecurityUtility;
 
 @Controller
@@ -39,24 +38,8 @@ public class HomeController {
 	private UserService userService;
 	
 	@Autowired
-	private RoleRepository roleRepository;
-	
-	@Autowired
-	private JavaMailSender mailSender;
-	
-	@Autowired
-	private MailConstructor mailConstructor;
-	
-	@Autowired
-	private SecurityUtility securityUtility;
-	
-	@Autowired
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
-	
-	
-	
-	
-	
+	private RoleRepository roleRepository;	
+        
 	@GetMapping(value="/")
 	public String index() {
 		return "redirect:/signin";
@@ -90,10 +73,6 @@ public class HomeController {
 			String token = UUID.randomUUID().toString();
 			userService.createResetPasswordToken(token, user);
 			
-			MimeMessage email = mailConstructor.constructRegistrationEmail(request.getLocale(), user, token);
-			
-			mailSender.send(email);
-			model.addAttribute("emailSent", true);
 			model.addAttribute("signupSuccess", true);
 			
 			return "signup";
@@ -124,61 +103,5 @@ public class HomeController {
 		model.addAttribute("account", account);
 		model.addAttribute("accountDetails", accountDetails);
 		return "home";
-	}
-	
-	@RequestMapping(value="/forgetPassword")
-	public String forgetPassword(Model model, @ModelAttribute("email") String userEmail) {
-		User user = userService.findByEmail(userEmail);
-		if(user == null) {
-			model.addAttribute("emailNotExists", true);
-			return "forgetPassword";
-		}
-		
-		
-		
-		String password = securityUtility.randomPassword();
-		String encryptedPassword = bCryptPasswordEncoder.encode(password);
-		user.setPassword(encryptedPassword);
-		
-		userService.save(user);
-		
-		String token = UUID.randomUUID().toString();
-		userService.createResetPasswordToken(token, user);
-		
-		String appUrl = "http://localhost:8080/user/userInformation?token="+token;
-		String text1 = "Click the link to change your password:";
-		String text = "Your temporary password is: " + password;
-		
-		String content = "<html>"+text1+"</html>" +
-						"<html><a href='"+appUrl+"'>"+appUrl+"</a></html>" + 
-						"<htm><br/></html>" +
-						"<htm><br/></html>" +
-						"<html>"+text+"</html>";
-		
-		
-		MimeMessage message = mailSender.createMimeMessage(); 
-        MimeMessageHelper helper;
-
-        try {
-            helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setSubject("Reset Password");
-            helper.setText(content, true);
-            helper.setFrom("yourEmail@gmail.com");
-            helper.setTo(user.getEmail());
-        } catch (MessagingException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } 
-
-        try {  
-            mailSender.send(message);
-        } catch (Exception e) {  
-            e.printStackTrace();  
-        }
-
-		model.addAttribute("resetEmailSent", true);
-		
-		return "forgetPassword";
 	}
 }
