@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<title>Personal Information</title>
+	<link href="/css/home.css" rel="stylesheet">
+	<link href="/css/userInformation.css" rel="stylesheet">
+	<link href="/css/userDetails.css" rel="stylesheet">
+</head>
+<head th:replace="header :: header"/>
+<head th:replace="header :: navbar"/>
+<body>
+<div class="information-wrapper">
+	<div class="basic-container">
+	<h4>Basic Information</h4>
+		<div class="basicInfo-wrapper">
+			<div class="form-container">
+				<label for="name">Name: </label>
+				<span class="input-field"><span id="name" th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span></span>
+			</div>
+			<div class="form-container">
+				<label for="email">Email: </label>
+				<span class="input-field" id="email" th:text="${user.email}"></span>
+			</div>
+			<div class="form-container">
+				<label for="ssn">Social Security Number: </label>
+				<span class="input-field" id="ssn" th:text="${user.socialSecurityNumber}"></span>
+			</div>
+		</div>
+	</div>
+	<br/>
+	
+	<div class="additional-container">
+		<h4>Edit/Save Additional Information</h4>
+		
+		<form th:action="@{/user/userInformation/save}" method="post">
+			<input type="hidden" name="id" th:value="${userProfile.id}" />
+			<div>
+				<div class="form-container">
+					<label for="address">Address</label>
+					<input class="input-field" type="text" id="address" name="address" th:value="${userProfile.address}" required="required" autofocus/>	
+				</div>
+				<div class="form-container">
+					<label for="city">City</label>
+					<input class="input-field" type="text" id="city" name="city" th:value="${userProfile.city}" required="required" autofocus/>
+				</div>
+				<div class="form-container">
+					<label for="state">State</label>
+					<input class="input-field" type="text" id="state" name="state" th:value="${userProfile.state}" required="required" autofocus/>
+				</div>
+				<div class="form-container">
+					<label for="zipCode">Zip Code</label>
+					<input class="input-field" type="text" id="zipCode" name="zipCode" th:value="${userProfile.zipCode}" required="required" autofocus/>
+				</div>
+				<div class="form-container">
+					<label for="gender">Gender</label>
+					<select name="gender" class="input-field">
+					    <option th:each="genders : ${T(com.application.bankApp.model.Gender).values()}" 
+					        th:value="${genders}" th:text="${genders}"></option>
+					</select>
+				</div>
+				<div class="form-container">
+					<label for="dob">Date of Birth</label>
+					<input class="input-field" type="text" id="dob" name="dob" th:value="${userProfile.dob}" required="required" autofocus/>
+				</div>
+				<div class="form-container">
+					<label for="newPassword">Password</label>
+					<input class="input-field" type="password" id="newPassword" name="newPassword" placeholder="Enter new Password to change" autofocus/>
+				</div>
+				<div class="form-container">
+					<label for="confirmPassword">Confirm Password</label>
+					<input class="input-field" type="password" id="confirmPassword" placeholder="Re-enter your password" autofocus/>
+				</div>
+			</div>
+			<button class="save-btn" type="submit">Save</button>
+		</form>
+	</div>
+</div>
+</br>
+</br>
+<div>
+<table class="center">
+	<thead>
+		<tr>
+			<th>Address</th>
+			<th>City</th>
+			<th>State</th>
+			<th>Zip Code</th>
+			<th>Gender</th>
+			<th>Date of Birth</th>
+			<th>Option</td>
+		</tr>
+	</thead>
+	<tbody>
+		<tr data-th-each="userData : ${user.userProfile}">
+			<td data-th-text="${userData.address}"></td>
+			<td data-th-text="${userData.city}"></td>
+			<td data-th-text="${userData.state}"></td>
+			<td data-th-text="${userData.zipCode}"></td>
+			<td data-th-text="${userData.gender}"></td>
+			<td data-th-text="${userData.dob}"></td>
+			<td><a th:href="@{/user/userInformation/edit?address=}+${userData.address}">Edit</a></td>
+		</tr>
+	</tbody>
+</table>
+</div>
+
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+<script src="/js/resetPassword.js"></script>
+</body>
+</html>
